@@ -103,8 +103,8 @@ Live prediction for any bounding box worldwide:
 ### Option 1: Docker (recommended)
 
 ```bash
-docker pull ghcr.io/ivanyachukr/terrapulse:latest
-docker run -p 8000:8000 ghcr.io/ivanyachukr/terrapulse:latest
+docker pull ghcr.io/stellamor/terrapulse:latest
+docker run -p 8000:8000 ghcr.io/stellamor/terrapulse:latest
 # Open http://localhost:8000
 ```
 
@@ -115,8 +115,8 @@ The Docker image contains everything: the Rust binary, ONNX model, frontend buil
 **Prerequisites:** Rust 1.83+, Python 3.12+, Node.js 22+
 
 ```bash
-git clone https://github.com/IvanYachUkr/TerraPulse.git
-cd TerraPulse
+git clone https://github.com/stellamoR/terrapulse.git
+cd terrapulse
 
 # Build the Rust binary
 cd terrapulse
