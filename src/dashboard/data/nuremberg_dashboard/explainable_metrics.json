@@ -1,0 +1,35 @@
+{
+  "overall_accuracy": 0.47710215121803684,
+  "macro_f1": 0.16096873451181232,
+  "recall": 0.4488619731557151,
+  "precision": 0.09806886009379433,
+  "false_change_rate": 0.5193450683010378,
+  "model_info": "Explainable Logistic Regression (optimized)",
+  "training_info": "Balanced samples (change/no-change)",
+  "features": [
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "B6",
+    "B7",
+    "B8",
+    "B8A",
+    "B11",
+    "B12",
+    "NDVI",
+    "Prev_LC",
+    "Pop",
+    "Housing",
+    "Comm",
+    "Cars",
+    "NDVI_Std"
+  ],
+  "balanced_metrics": {
+    "Acc": 0.4643403859165879,
+    "F1": 0.4559188736678178,
+    "Prec": 0.46320121226527217,
+    "Rec": 0.4488619731557151,
+    "FCR": 0.5201812013225393
+  }
+}
