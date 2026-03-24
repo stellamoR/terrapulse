@@ -1,0 +1,166 @@
+import { useEffect, useRef } from 'react';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
+
+const MODEL_DISPLAY = {
+    mlp: 'MLP',
+    tree: 'LightGBM',
+    ridge: 'Ridge',
+};
+
+const MODEL_COLORS_BAR = {
+    mlp: { bg: 'rgba(236,72,153,0.6)', border: 'rgb(236,72,153)' },
+    tree: { bg: 'rgba(16,185,129,0.6)', border: 'rgb(16,185,129)' },
+    ridge: { bg: 'rgba(59,130,246,0.6)', border: 'rgb(59,130,246)' },
+};
+
+export default function ModelComparison({ models, evaluation }) {
+    const r2Ref = useRef(null);
+    const maeRef = useRef(null);
+    const aitchRef = useRef(null);
+    const r2ChartRef = useRef(null);
+    const maeChartRef = useRef(null);
+    const aitchChartRef = useRef(null);
+
+    useEffect(() => {
+        if (!models || !r2Ref.current || !maeRef.current) return;
+
+        // Destroy previous
+        if (r2ChartRef.current) r2ChartRef.current.destroy();
+        if (maeChartRef.current) maeChartRef.current.destroy();
+
+        const sorted = [...models].sort((a, b) => b.r2_uniform - a.r2_uniform);
+        const labels = sorted.map((m) => MODEL_DISPLAY[m.model] || m.model);
+        const bgColors = sorted.map((m) => MODEL_COLORS_BAR[m.model]?.bg || 'rgba(148,163,184,0.6)');
+        const borderColors = sorted.map((m) => MODEL_COLORS_BAR[m.model]?.border || 'rgb(148,163,184)');
+
+        const chartOpts = {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#94a3b8', font: { size: 10 } },
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                },
+                y: {
+                    ticks: { color: '#f0f4f8', font: { size: 11, family: 'Inter' } },
+                    grid: { display: false },
+                },
+            },
+        };
+
+        r2ChartRef.current = new Chart(r2Ref.current, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'R2',
+                    data: sorted.map((m) => m.r2_uniform),
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                ...chartOpts,
+                scales: {
+                    ...chartOpts.scales,
+                    x: { ...chartOpts.scales.x, min: 0, max: 1, title: { display: true, text: 'R2 (uniform)', color: '#64748b', font: { size: 10 } } },
+                },
+            },
+        });
+
+        maeChartRef.current = new Chart(maeRef.current, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'MAE (pp)',
+                    data: sorted.map((m) => m.mae_mean_pp),
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                ...chartOpts,
+                scales: {
+                    ...chartOpts.scales,
+                    x: { ...chartOpts.scales.x, min: 0, title: { display: true, text: 'MAE (pp)', color: '#64748b', font: { size: 10 } } },
+                },
+            },
+        });
+
+        // Aitchison distance chart (from evaluation data)
+        if (aitchChartRef.current) aitchChartRef.current.destroy();
+        if (evaluation?.aggregate && aitchRef.current) {
+            const aitchSorted = [...evaluation.aggregate].sort((a, b) => a.aitchison_mean - b.aitchison_mean);
+            aitchChartRef.current = new Chart(aitchRef.current, {
+                type: 'bar',
+                data: {
+                    labels: aitchSorted.map((m) => MODEL_DISPLAY[m.model] || m.model),
+                    datasets: [{
+                        label: 'Aitchison Distance',
+                        data: aitchSorted.map((m) => m.aitchison_mean),
+                        backgroundColor: aitchSorted.map((m) => {
+                            if (m.model === 'MLP') return 'rgba(236,72,153,0.6)';
+                            if (m.model === 'LightGBM') return 'rgba(16,185,129,0.6)';
+                            return 'rgba(59,130,246,0.6)';
+                        }),
+                        borderColor: aitchSorted.map((m) => {
+                            if (m.model === 'MLP') return 'rgb(236,72,153)';
+                            if (m.model === 'LightGBM') return 'rgb(16,185,129)';
+                            return 'rgb(59,130,246)';
+                        }),
+                        borderWidth: 1,
+                    }],
+                },
+                options: {
+                    ...chartOpts,
+                    scales: {
+                        ...chartOpts.scales,
+                        x: { ...chartOpts.scales.x, min: 0, title: { display: true, text: 'Aitchison Distance (lower = better)', color: '#64748b', font: { size: 10 } } },
+                    },
+                },
+            });
+        }
+
+        return () => {
+            if (r2ChartRef.current) { r2ChartRef.current.destroy(); r2ChartRef.current = null; }
+            if (maeChartRef.current) { maeChartRef.current.destroy(); maeChartRef.current = null; }
+            if (aitchChartRef.current) { aitchChartRef.current.destroy(); aitchChartRef.current = null; }
+        };
+    }, [models, evaluation]);
+
+    if (!models) return null;
+
+    return (
+        <div className="model-comparison">
+            <div className="card">
+                <div className="card-title">Model R&sup2; Comparison <span style={{ color: '#64748b', fontWeight: 400, fontSize: 10 }}>(5-fold CV avg)</span></div>
+                <div style={{ height: 160, position: 'relative' }}>
+                    <canvas ref={r2Ref} />
+                </div>
+            </div>
+            <div className="card" style={{ marginTop: 12 }}>
+                <div className="card-title">Model MAE Comparison <span style={{ color: '#64748b', fontWeight: 400, fontSize: 10 }}>(5-fold CV avg)</span></div>
+                <div style={{ height: 160, position: 'relative' }}>
+                    <canvas ref={maeRef} />
+                </div>
+            </div>
+            {evaluation?.aggregate && (
+                <div className="card" style={{ marginTop: 12 }}>
+                    <div className="card-title">Aitchison Distance</div>
+                    <div style={{ height: 140, position: 'relative' }}>
+                        <canvas ref={aitchRef} />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

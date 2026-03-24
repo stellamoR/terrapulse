@@ -1,0 +1,116 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+
+# === Data (too large for git) ===
+data/
+!data/nuremberg_stats/
+!data/nuremberg_stats/bezirke_stats/
+!data/nuremberg_stats/geojsons_stats/nuremberg_stat_bezirke_wgs84.geojson
+
+# Dashboard data (Keep metadata, ignore large grids/predictions/binaries)
+src/dashboard/data/*.json
+src/dashboard/data/*.bin
+src/dashboard/data/nuremberg_dashboard/
+src/dashboard/data/shap_plots/
+src/dashboard/data/nuremberg/
+!src/dashboard/data/model_benchmark.json
+!src/dashboard/data/nuremberg_boundary.geojson
+!src/dashboard/data/conformal.json
+!src/dashboard/data/evaluation.json
+!src/dashboard/data/explainability.json
+!src/dashboard/data/failure_analysis.json
+!src/dashboard/data/stress_tests.json
+!src/dashboard/data/split.json
+!src/dashboard/data/nuremberg_dashboard/nuremberg_dashboard_meta.json
+!src/dashboard/data/nuremberg_dashboard/district_stats.json
+!src/dashboard/data/nuremberg_dashboard/experimental_metrics.json
+!src/dashboard/data/nuremberg_dashboard/*.bin
+reports/figures/
+reports/phase6/
+reports/phase7/
+research/
+*.tif
+*.tiff
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+
+# === Environment ===
+.env
+.venv/
+venv/
+env/
+*.env
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Jupyter ===
+.ipynb_checkpoints/
+*.ipynb_meta
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Rust ===
+rust_features/target/
+terrapulse/target/
+*.pyd
+
+# === Misc ===
+_pdf_extracted.txt
+cache/
+*.log
+catboost_info/
+
+# === Ad-hoc debug/analysis scripts (underscore-prefixed) ===
+scripts/_*.py
+_check_*.py
+_compare_*.py
+_debug_*.py
+
+# Phase 10 SHAP cache (large)
+_shap_cache.pkl
+
+# === Temp files ===
+_watcher.ps1
+_assignment_text.txt
+
+# === Model weights (large binary files) ===
+models/final_mlp_rust/
+models/final_mlp_pyv3/
+
+# === CSV results ===
+*.csv
+
+# === Temporary scripts & logs ===
+terrapulse/check_s1_compression.py
+terrapulse/s1_tags.txt
+old_rust.rs
+
+# ignore typ files
+*.typ
+
+#ignore bib files
+*.bib
+
+terrapulse_full_codebase.md
+# Model backup files
+*.bak_v*
+
+data from clemens/*
